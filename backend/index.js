@@ -11,6 +11,7 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
+  // TODO: tell all clients that this user connected
   console.log("a user connected");
 
   socket.on("element-focus", (msg) => {
@@ -24,6 +25,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+    // TODO: tell all clients that this user disconnected
     console.log("user disconnected");
   });
 });

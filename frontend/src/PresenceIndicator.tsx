@@ -1,38 +1,49 @@
+import { cloneElement, useContext } from "react";
+import { UserPresenceContext } from "./context/UserPresenceContext";
+
 const PresenceIndicator = ({
-  users,
   children,
+  label,
+  description = "",
 }: {
-  users: {
-    [userId: string]: { avatar: string; elementId: string };
-  };
   children: React.ReactElement;
+  label: string;
+  description?: string;
 }) => {
-  const maxAvatars = 5;
+  const userPresenceContext = useContext(UserPresenceContext);
+  const users = userPresenceContext?.usersPresent || {};
 
   const filteredUsers = Object.keys(users).filter(
     (user) => users[user].elementId === children?.props.id
   );
-  const displayedUsers = Object.keys(filteredUsers).slice(0, maxAvatars);
-  const remainingUsers = Object.keys(filteredUsers).length - maxAvatars;
 
   return (
-    <div className="user-indicator-container">
-      {children}
+    <div>
+      <strong>{label}</strong>
       <div className="user-indicator-avatars">
-        {displayedUsers.map((user, index) => (
+        {filteredUsers.map((user, index) => (
           <div key={index} className="user-avatar" title={user}>
             {users[user]?.avatar}
           </div>
         ))}
-        {remainingUsers > 0 && (
-          <div
-            className="user-avatar more-users"
-            title={`${remainingUsers} more users`}
-          >
-            +{remainingUsers}
-          </div>
-        )}
       </div>
+      {description && <p>{description}</p>}
+
+      {cloneElement(children, {
+        // TODO: don't override onFocus/onBlur if they are already set, add to them
+        onFocus: () => {
+          userPresenceContext?.setPresenceEvent(
+            "element-focus",
+            children?.props.id
+          );
+        },
+        onBlur: () => {
+          userPresenceContext?.setPresenceEvent(
+            "element-blur",
+            children?.props.id
+          );
+        },
+      })}
     </div>
   );
 };

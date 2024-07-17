@@ -18,12 +18,6 @@ textarea {
   border: 1px solid #ccc;
 }
 
-.user-indicator-container {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
 .user-indicator-avatars {
   display: flex;
   position: absolute;
@@ -35,26 +29,11 @@ textarea {
   height: 30px;
   border-radius: 50%;
   overflow: hidden;
-  margin-left: -10px;
   border: 2px solid #fff;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
   align-items: center;
   background: #eee;
-}
-
-.user-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.more-users {
-  background: #ccc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 0.8em;
-  color: #333;
+  color: black;
 }
