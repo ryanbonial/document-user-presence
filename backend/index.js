@@ -11,22 +11,24 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  // TODO: tell all clients that this user connected
-  console.log("a user connected");
+  console.log("a user connected", socket.id);
+  io.emit("user-connected", { id: socket.id });
 
   socket.on("element-focus", (msg) => {
+    msg.id = socket.id;
     console.log("message: ", JSON.stringify(msg));
     io.emit("element-focus", msg);
   });
 
   socket.on("element-blur", (msg) => {
+    msg.id = socket.id;
     console.log("message: ", JSON.stringify(msg));
     io.emit("element-blur", msg);
   });
 
   socket.on("disconnect", () => {
-    // TODO: tell all clients that this user disconnected
-    console.log("user disconnected");
+    console.log("user disconnected", socket.id);
+    io.emit("user-disconnected", { id: socket.id });
   });
 });
 

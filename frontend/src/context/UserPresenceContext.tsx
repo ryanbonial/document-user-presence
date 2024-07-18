@@ -4,7 +4,7 @@ import { io, Socket } from "socket.io-client";
 const UserPresenceContext = createContext<
   | {
       usersPresent: {
-        [userId: string]: { avatar: string; elementId: string };
+        [userId: string]: { avatar: string; elementId: string; id: string };
       };
       setPresenceEvent: (
         eventType: "element-focus" | "element-blur",
@@ -27,7 +27,7 @@ const UserPresenceProvider = ({
   const mockPageId = "4e16fa44-66eb-4d0c-bb6a-65de95023c9f";
 
   const [usersPresent, setUsersPresent] = useState<{
-    [userId: string]: { avatar: string; elementId: string };
+    [userId: string]: { avatar: string; elementId: string; id: string };
   }>({});
   const [userId, setUserId] = useState("");
   const [avatar, setAvatar] = useState("");
@@ -73,10 +73,12 @@ const UserPresenceProvider = ({
           [data.message.userId]: {
             avatar: data.message.avatar,
             elementId: data.message.elementId,
+            id: data.id,
           },
         };
       });
     });
+
     socket.current.on("element-blur", (data) => {
       if (data.message.userId === userId) {
         return;
@@ -90,6 +92,27 @@ const UserPresenceProvider = ({
         }
         const updatedUsersPresent = { ...prevUsersPresent };
         updatedUsersPresent[data.message.userId].elementId = "";
+        updatedUsersPresent[data.message.userId].id = data.id;
+        return updatedUsersPresent;
+      });
+    });
+
+    socket.current.on("user-disconnected", (data) => {
+      setUsersPresent((prevUsersPresent) => {
+        // find the user that disconnected by socket id
+        if (!data.id) {
+          return prevUsersPresent;
+        }
+
+        const disconnectedUser = Object.keys(prevUsersPresent).find(
+          (userId) => prevUsersPresent[userId]?.id === data.id
+        );
+
+        if (!disconnectedUser) {
+          return prevUsersPresent;
+        }
+        delete prevUsersPresent[disconnectedUser];
+        const updatedUsersPresent = { ...prevUsersPresent };
         return updatedUsersPresent;
       });
       console.log("Received data:", data);
